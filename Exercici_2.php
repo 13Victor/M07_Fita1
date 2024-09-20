@@ -9,7 +9,6 @@
     <table style="border: 1px solid black; border-collapse: collapse;">
         <tr>
             <?php
-                // Primera fila de letras
                 $n = 4;
                 for($i = 0; $i <= $n; $i++){
                     echo "<td style='border: 1px solid black; border-collapse: collapse;'>".chr($i+65)."</td>";
@@ -18,7 +17,6 @@
         </tr>
         <tr>
             <?php
-                // Segunda fila de números
                 for($i = 0; $i <= $n; $i++){
                     echo "<td style='border: 1px solid black; border-collapse: collapse;'>$i</td>";
                 }

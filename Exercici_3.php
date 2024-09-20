@@ -11,13 +11,12 @@
             $m = 4; // Número de filas
             $n = 6; // Número de columnas
             
-            for ($j = 0; $j < $m; $j++) { // Bucle para las filas
+            for ($j = 0; $j < $m; $j++) {
 	            echo "<tr>";
-		            for ($i = 0; $i < $n; $i++) { // Bucle para las columnas
-		                // Mostrar el valor correspondiente (incrementando por fila)
+		            for ($i = 0; $i < $n; $i++) {
 		                echo "<td style='border: 1px solid black; padding: 5px;'>".($i + $j)."</td>";
 	            	}
-	            echo "</tr>"; // Cerrar fila
+	            echo "</tr>";
             }
         ?>
     </table>

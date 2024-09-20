@@ -49,6 +49,7 @@
 				}
 				echo "</tr>";
 			}
+			
 		?>
 	</table>
 </body>

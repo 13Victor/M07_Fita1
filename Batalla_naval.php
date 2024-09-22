@@ -8,9 +8,9 @@
 		td, th {
 			border: 1px solid black;
 			padding: 5px;
-			font-size: 18px;
-			width: 30px;
-			height: 30px;
+			font-size: 8px;
+			width: 10px;
+			height: 10px;
 			text-align: center;
 		}
 
@@ -23,80 +23,131 @@
 <body>
 	<table>
 		<?php
-			$letras = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
-			$vaixells = [
-				"fragata" => [array(), 1, "#C70039"],
-				"submari" => [array(), 2, "#0057C7"],
-				"destructor" => [array(), 3, "#00C745"],  
-				"portaavions" => [array(), 4, "#EFDF23"]  
+			// Tamaño del tablero
+			$n = 10;
+
+			// Información de los barcos
+			$ships = [
+				"frigate" => [array(), 1, "#C70039"],
+				"submarine" => [array(), 2, "#0057C7"],
+				"destroyer" => [array(), 3, "#00C745"],  
+				"aircraft_carrier" => [array(), 4, "#EFDF23"]  
 			];
 
-			$valid_positions = false;
+			
 
-			// Generar posiciones válidas sin solapamientos
+			// Generar posiciones válidas sin solapamientos y sin barcos adyacentes
 			while (!$valid_positions) {
+				$valid_positions = false;
 				$all_positions = [];
-				$tablero = array_fill(0, 10, array_fill(0, 10, null));
-				
-				foreach ($vaixells as $nombre => $vaixell) {
-					$ship_length = $vaixell[1];
-					$ship_positions = [];
-					$orientation = rand(0, 1); // 0: horizontal, 1: vertical
+				$board = array_fill(0, $n, array_fill(0, $n, null)); // Matriz NxN vacía
+				$valid_positions = true; // Asumimos que será válida hasta que falle algo
 
-					if ($orientation == 0) { 
-						$start_row = rand(0, 9);
-						$start_col = rand(0, 10 - $ship_length);
-						for ($j = 0; $j < $ship_length; $j++) {
-							$ship_positions[] = [$start_row, $start_col + $j];
-							$tablero[$start_row][$start_col + $j] = $nombre;
+				foreach ($ships as $name => $ship) {
+					$ship_length = $ship[1];
+					$ship_positions = [];
+					$placed = false;
+
+					for ($attempts = 0; $attempts < 100 && !$placed; $attempts++) {
+						$orientation = rand(0, 1); // 0: horizontal, 1: vertical
+						
+						// Determinamos posición de inicio
+						if ($orientation == 0) { // Colocar horizontalmente
+							$start_row = rand(0, $n - 1);
+							$start_col = rand(0, $n - $ship_length);
+						} else { // Colocar verticalmente
+							$start_row = rand(0, $n - $ship_length);
+							$start_col = rand(0, $n - 1);
 						}
-					} else { 
-						$start_row = rand(0, 10 - $ship_length);
-						$start_col = rand(0, 9);
-						for ($j = 0; $j < $ship_length; $j++) {
-							$ship_positions[] = [$start_row + $j, $start_col];
-							$tablero[$start_row + $j][$start_col] = $nombre;
+
+						$can_place = true;
+
+						// Revisar todas las celdas donde el barco se colocará
+						for ($i = 0; $i < $ship_length; $i++) {
+							if ($orientation == 0) { // Horizontal
+								$row = $start_row;
+								$col = $start_col + $i;
+							} else { // Vertical
+								$row = $start_row + $i;
+								$col = $start_col;
+							}
+
+							// Verificar si las celdas adyacentes están ocupadas o no
+							for ($r = $row - 1; $r <= $row + 1 && $can_place; $r++) {
+								for ($c = $col - 1; $c <= $col + 1 && $can_place; $c++) {
+									// Solo consideramos las celdas dentro del tablero
+									if ($r >= 0 && $r < $n && $c >= 0 && $c < $n) {
+										if (!empty($board[$r][$c])) {
+											$can_place = false; // Hay algo en una celda adyacente
+										}
+									}
+								}
+							}
+						}
+
+						// Si todas las celdas (y las adyacentes) están vacías, colocamos el barco
+						if ($can_place) {
+							for ($i = 0; $i < $ship_length; $i++) {
+								if ($orientation == 0) {
+									$board[$start_row][$start_col + $i] = $name;
+									$ship_positions[] = [$start_row, $start_col + $i];
+								} else {
+									$board[$start_row + $i][$start_col] = $name;
+									$ship_positions[] = [$start_row + $i, $start_col];
+								}
+							}
+							$ships[$name][0] = $ship_positions; // Guardamos las posiciones del barco
+							$placed = true; // El barco ha sido colocado
 						}
 					}
-					$vaixells[$nombre][0] = $ship_positions;
+
+					if (!$placed) {
+						break; // Si no se puede colocar un barco, rompemos el ciclo
+					}
 				}
 
-				foreach ($vaixells as $vaixell) {
-					foreach ($vaixell[0] as $pos) {
+				// Comprobación de solapamientos o cercanía entre barcos
+				$all_positions = [];
+				foreach ($ships as $ship) {
+					foreach ($ship[0] as $pos) {
 						$all_positions[] = $pos;	
 					}
 				}
 
-				$coordenadas_serializadas = array_map('serialize', $all_positions);
-				if (count($coordenadas_serializadas) == count(array_unique($coordenadas_serializadas))) {
+				// Serializamos las coordenadas y verificamos si hay duplicados
+				$serialized_coords = array_map('serialize', $all_positions);
+				if (count($serialized_coords) == count(array_unique($serialized_coords))) {
 					$valid_positions = true;
 				}
 			}
 
-			$n = 10;
-
-			// Cabecera de la tabla
+			// Cabecera de la tabla (números)
 			echo "<tr><td></td>";
 			for ($i = 1; $i <= $n; $i++) {
 				echo "<th>$i</th>";
 			}
 			echo "</tr>";
 
-			// Rellenar tabla con barcos y espacios vacíos
-			foreach ($letras as $fila_index => $letra) {
-				echo "<tr><th>$letra</th>";
+			// Generar letras para las filas (A, B, C, ...)
+			$letters = [];
+			for ($i = 0; $i < $n; $i++) {
+				$letters[] = chr(65 + $i);
+			}
+
+			// Rellenar la tabla con barcos y espacios vacíos
+			foreach ($letters as $row_index => $letter) {
+				echo "<tr><th>$letter</th>"; // Fila con letra
 				for ($col = 0; $col < $n; $col++) {
-					if ($tablero[$fila_index][$col] !== null) {
-						$nombre_barco = $tablero[$fila_index][$col];
-						$ship_color = $vaixells[$nombre_barco][2];
-						echo "<td style='background: $ship_color;'></td>";
+					if ($board[$row_index][$col] !== null) {
+						$ship_name = $board[$row_index][$col];
+						$ship_color = $ships[$ship_name][2];
+						echo "<td style='background: $ship_color;'></td>"; // Pintar barco
 					} else {
-						echo "<td></td>";
+						echo "<td></td>"; // Espacio vacío
 					}
 				}
 				echo "</tr>";
 			}
-
 		?>
 	</table>
 </body>

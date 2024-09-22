@@ -25,36 +25,52 @@
 		<?php
 			$letras = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
 			$vaixells = [
-				"fragata" => [array(), 1, "red"],
-				"submari" => [array(), 2, "blue"],
-				"destructor" => [array(), 3, "green"],  
-				"portaavions" => [array(), 4, "black"]  
+				"fragata" => [array(), 1, "#C70039"],
+				"submari" => [array(), 2, "#0057C7"],
+				"destructor" => [array(), 3, "#00C745"],  
+				"portaavions" => [array(), 4, "#EFDF23"]  
 			];
 
-			foreach ($vaixells as $nombre => $vaixell) {
-				$ship_length = $vaixell[1];
-				$ship_positions = [];
+			$valid_positions = false;
 
-				// Elegir aleatoriamente la orientación del barco
-				$orientation = rand(0, 1); // 0 = horizontal, 1 = vertical
+			// Generar posiciones válidas sin solapamientos
+			while (!$valid_positions) {
+				$all_positions = [];
+				$tablero = array_fill(0, 10, array_fill(0, 10, null));
 				
-				if ($orientation == 0) { // Horizontal
-					$start_row = rand(1, 10);
-					$start_col = rand(0, 10 - $ship_length); // Ajustamos la columna para que el barco no se salga del tablero
+				foreach ($vaixells as $nombre => $vaixell) {
+					$ship_length = $vaixell[1];
+					$ship_positions = [];
+					$orientation = rand(0, 1); // 0: horizontal, 1: vertical
 
-					for ($j = 0; $j < $ship_length; $j++) {
-						$ship_positions[] = [$start_row, $letras[$start_col + $j]];
+					if ($orientation == 0) { 
+						$start_row = rand(0, 9);
+						$start_col = rand(0, 10 - $ship_length);
+						for ($j = 0; $j < $ship_length; $j++) {
+							$ship_positions[] = [$start_row, $start_col + $j];
+							$tablero[$start_row][$start_col + $j] = $nombre;
+						}
+					} else { 
+						$start_row = rand(0, 10 - $ship_length);
+						$start_col = rand(0, 9);
+						for ($j = 0; $j < $ship_length; $j++) {
+							$ship_positions[] = [$start_row + $j, $start_col];
+							$tablero[$start_row + $j][$start_col] = $nombre;
+						}
 					}
-				} else { // Vertical
-					$start_row = rand(1, 10 - $ship_length); // Ajustamos la fila para que el barco no se salga del tablero
-					$start_col = rand(0, 9);
+					$vaixells[$nombre][0] = $ship_positions;
+				}
 
-					for ($j = 0; $j < $ship_length; $j++) {
-						$ship_positions[] = [$start_row + $j, $letras[$start_col]];
+				foreach ($vaixells as $vaixell) {
+					foreach ($vaixell[0] as $pos) {
+						$all_positions[] = $pos;	
 					}
 				}
 
-				$vaixells[$nombre][0] = $ship_positions; // Asignar las posiciones al array original
+				$coordenadas_serializadas = array_map('serialize', $all_positions);
+				if (count($coordenadas_serializadas) == count(array_unique($coordenadas_serializadas))) {
+					$valid_positions = true;
+				}
 			}
 
 			$n = 10;
@@ -66,27 +82,13 @@
 			}
 			echo "</tr>";
 
-			// Recorremos las filas
-			foreach ($letras as $letra) {
+			// Rellenar tabla con barcos y espacios vacíos
+			foreach ($letras as $fila_index => $letra) {
 				echo "<tr><th>$letra</th>";
-
-				// Recorremos las columnas
-				for ($i = 1; $i <= $n; $i++) {
-					$ship_found = false;
-					$ship_color = null;
-
-					// Verificar si en esta celda hay un barco
-					foreach ($vaixells as $vaixell) {
-						foreach ($vaixell[0] as $pos) {
-							if ($i == $pos[0] && $pos[1] == $letra) {
-								$ship_found = true;
-								$ship_color = $vaixell[2];
-							}
-						}
-					}
-
-					// Pintamos la celda
-					if ($ship_found) {
+				for ($col = 0; $col < $n; $col++) {
+					if ($tablero[$fila_index][$col] !== null) {
+						$nombre_barco = $tablero[$fila_index][$col];
+						$ship_color = $vaixells[$nombre_barco][2];
 						echo "<td style='background: $ship_color;'></td>";
 					} else {
 						echo "<td></td>";
@@ -94,6 +96,7 @@
 				}
 				echo "</tr>";
 			}
+
 		?>
 	</table>
 </body>

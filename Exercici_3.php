@@ -9,7 +9,7 @@
 	<table style="border: 1px solid black; border-collapse: collapse;">
         <?php
             $m = 4; // Número de filas
-            $n = 6; // Número de columnas
+            $n = 7; // Número de columnas
             
             for ($j = 0; $j < $m; $j++) {
 	            echo "<tr>";

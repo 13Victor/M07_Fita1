@@ -7,18 +7,18 @@
 </head>
 <body>
     <table style="border: 1px solid black; border-collapse: collapse;">
-        <tr>
+        <tr style="text-align: center;">
             <?php
-                $n = 4;
+                $n = 12;
                 for($i = 0; $i <= $n; $i++){
-                    echo "<td style='border: 1px solid black; border-collapse: collapse;'>".chr($i+65)."</td>";
+                    echo "<td style='border: 1px solid black; border-collapse: collapse; padding: 3px;'>".chr($i+65)."</td>";
                 }
             ?>
         </tr>
-        <tr>
+        <tr style="text-align: center;">
             <?php
                 for($i = 0; $i <= $n; $i++){
-                    echo "<td style='border: 1px solid black; border-collapse: collapse;'>$i</td>";
+                    echo "<td style='border: 1px solid black; border-collapse: collapse; padding: 3px;'>$i</td>";
                 }
             ?>
         </tr>

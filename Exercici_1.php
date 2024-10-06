@@ -7,12 +7,14 @@
 </head>
 <body>
     <table style="border: 1px solid black; border-collapse: collapse;">
-        <tr>
+        <tr style="text-align: center;">
             <?php
 
-                for($i = 0; $i <= 7; $i++){
+                $n = 12;
 
-                    echo "<td style='border: 1px solid black; border-collapse: collapse;'> $i </td>";
+                for($i = 0; $i <= $n; $i++){
+
+                    echo "<td style='border: 1px solid black; border-collapse: collapse; padding: 3px;'> $i </td>";
 
                 }
             ?>

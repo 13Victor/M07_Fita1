@@ -8,9 +8,9 @@
         td, th {
             border: 1px solid black;
             padding: 5px;
-            font-size: 8px;
-            width: 10px;
-            height: 10px;
+            font-size: 11px;
+            width: 15px;
+            height: 15px;
             text-align: center;
         }
 
@@ -28,17 +28,15 @@
             $n = 26;
         }
 
-        // Barcos con el 4º valor indicando la cantidad de barcos de cada tipo
         $ships = [
-            "frigate" => [[], 1, "#C70039", 4], // 4 fragatas
-            "submarine" => [[], 2, "#0057C7", 3], // 3 submarinos
-            "destroyer" => [[], 3, "#00C745", 2], // 2 destructores
-            "aircraft_carrier" => [[], 4, "#EFDF23", 1] // 1 portaaviones
+            "fragata" => [[], 1, "#C70039", 4],
+            "submarí" => [[], 2, "#0057C7", 3],
+            "destructor" => [[], 3, "#00C745", 2],
+            "portaavions" => [[], 4, "#EFDF23", 1]
         ];
 
         $board = array_fill(0, $n, array_fill(0, $n, null));
 
-        // Colocar un solo barco
         function placeShip(&$board, &$ship) {
             $n = count($board);
             $ship_length = $ship[1];
@@ -105,7 +103,7 @@
             for ($i = 0; $i < $ship[3]; $i++) { // Intentar colocar la cantidad definida de cada barco
                 if (!placeShip($board, $ship)) {
                     $all_ships_placed = false;
-                    break 2; // Salir de ambos bucles si no se puede colocar un barco
+                    break 2;
                 }
             }
         }
